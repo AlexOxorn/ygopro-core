@@ -264,7 +264,7 @@ public:
 	uint32 get_another_code();
 
 	/**
-	 * Check whether a card is part of an archetype
+	 * Check whether the card is part of an archetype
 	 * 
 	 * If the card is being treated as it's own name, use it's archetypes
 	 * If the card is being treaded as a different name, read the new names archetypes
@@ -285,7 +285,7 @@ public:
 	int32 is_set_card(uint32 set_code);
 
 	/**
-	 * Check whether a card's printed name is part of an archetype
+	 * Check whether the card's printed name is part of an archetype
 	 * 
 	 * Same as `is_set_card` except it only checks the printed name
 	 * 
@@ -293,6 +293,18 @@ public:
 	 * @returns true if this card's printed name is part of that archetype, false otherwise
 	 */
 	int32 is_origin_set_card(uint32 set_code);
+
+	/**
+	 * Check whether the card belonged to an archetype while it was in its previous position
+	 * 
+	 * If the card's name didn't change between its previous and current location, use the current set_code
+	 * If the card's name has changed, read the set_for the new card
+	 * 
+	 * Use same logic as `is_set_card`
+	 * 
+	 * @param set_code the archetype you want to check for
+	 * @returns true if this card's name in its previous location is part of that archetype, false otherwise
+	 */
 	int32 is_pre_set_card(uint32 set_code);
 	int32 is_fusion_set_card(uint32 set_code);
 	int32 is_link_set_card(uint32 set_code);
