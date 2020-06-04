@@ -191,13 +191,120 @@ public:
 	static bool card_operation_sort(card* c1, card* c2);
 	const bool is_extra_deck_monster() { return !!(data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_LINK)); }
 
+	/**
+	 *	Gets info about a card 
+	 *	
+	 *	This method takes a query flag, and for each type of query,
+	 *	it will retireives the data, and assign it to the q_cache param of the card
+     *
+	 *	If the `use_cache` param is `true`, then it will check if the data is different
+	 *	and reassign, otherwise will just leave it the same.
+     *
+	 *	@param buf Byte buffer which will hold 8 bytes. The first 4 will be the ammount,
+	 *		of new data assigned, and the later 4 will be a copy of the `query_flag`
+	 *	@param query_flag the set of queries you want to perform
+	 *	@param use_cache revalutate all the queried data or not
+	 *	
+	 *	@return number of byes read
+	 */
 	uint32 get_infos(byte* buf, int32 query_flag, int32 use_cache = TRUE);
+
+	/**
+	 * Gets info of a cards current location
+	 * 
+	 * Retrives a card's:
+	 * 		controller, location, sequence, and position
+	 * or if it is an Xyz material, the Xyz's monster's:
+	 * 		controller, location, sequence, and the material's sequence
+	 * 
+	 * @returns a 4 byte interger reqresenting (a byte each)
+	 * 	[(own/xyz) controller, (own/xyz) location, (own/xyz) sequence, position/own sequence]
+	 */
 	uint32 get_info_location();
+
+	/**
+	 * Mapping of double-name cards
+	 * 
+	 * Gets the second id for cards that are treated as 2 different cards
+	 * 
+	 * @returns the id representing the card's alternate code
+	 * 			0 if the card isn't treaded as two cards
+	 */
 	uint32 second_code(uint32 code);
+
+	/**
+	 * Get the current card's name(code)
+	 * for double-name card, it returns printed name
+	 * 
+	 * If the card is being assumed to have a name, return that name
+	 * If the card has a temporary name, return that name
+	 * If the card is affected by a name chageing effect, return the new name, or the new name's alias if applicable
+	 * If the card has an alias, but is not affected by a name adding effect, return that alias
+	 * 
+	 * otherwise return the card's printed name
+	 * 
+	 * @returns card's current name
+	 */
 	uint32 get_code();
+
+	/**
+	 * Get the current card's second_name(code)
+	 * for double-name card, it returns the name in description
+	 * 
+	 * If the card's current name is different from its printed name, return 0.
+	 * 		Exception if current name is Marine Dolphin and Twinkle Moss:
+	 * 		In those case, it will return Aqua Dolphin or Glow Moss respectively
+	 * If the card is being effected by an name adding effect:
+	 * 		return the last of those new names if it is different from the current name
+	 * 
+	 * otherwise return 0
+	 * 
+	 * @returns card's second name, or 0
+	 */
 	uint32 get_another_code();
+
+	/**
+	 * Check whether the card is part of an archetype
+	 * 
+	 * If the card is being treated as it's own name, use it's archetypes
+	 * If the card is being treaded as a different name, read the new names archetypes
+	 * If the card is affected by an archetype adding effect, check those archetypes
+	 * If the card has multiple names, check its second name
+	 * 
+	 * otherwise, return false
+	 * 
+	 * Set codes made up of 4 nibbles.
+	 * 		The least signigicant 3 determine the main set (Like HERO)
+	 * 		The most significant nibble determines the sub set (like Masked HEROs)
+	 * 
+	 * A cards setcode is a bitwise collection of 4 nibble set code
+	 * 
+	 * @param set_code the archetype you want to check for
+	 * @returns true if this card is part of that archetype, false otherwise
+	 */
 	int32 is_set_card(uint32 set_code);
+
+	/**
+	 * Check whether the card's printed name is part of an archetype
+	 * 
+	 * Same as `is_set_card` except it only checks the printed name
+	 * 
+	 * @param set_code the archetype you want to check for
+	 * @returns true if this card's printed name is part of that archetype, false otherwise
+	 */
 	int32 is_origin_set_card(uint32 set_code);
+
+	/**
+	 * Check whether the card belonged to an archetype while it was in its previous position
+	 * 
+	 * If the card's name didn't change between its previous and current location, use the current set_code
+	 * If the card's name has changed, read the set_for the new card
+	 * 
+	 * Use same logic as `is_set_card`
+	 * 
+	 * @param set_code the archetype you want to check for
+	 * @returns true if this card's name in its previous location is part of that archetype, false otherwise
+	 */
 	int32 is_pre_set_card(uint32 set_code);
 	int32 is_fusion_set_card(uint32 set_code);
 	int32 is_link_set_card(uint32 set_code);
